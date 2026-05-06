@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SisKul - Sistem Ekstrakurikuler SMK Negeri 8 Malang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR - WARNA ORANYE */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #ea580c 0%, #c2410c 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 28px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 24px;
+        }
+
+        .brand-icon {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .brand-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .brand-text h2 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: white;
+        }
+
+        .brand-text span {
+            font-size: 11px;
+            opacity: 0.8;
+            display: block;
+        }
+
+        .sidebar-nav {
+            padding: 0 16px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            margin-bottom: 8px;
+            border-radius: 14px;
+            color: #ffedd5;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item i {
+            width: 22px;
+            font-size: 1.2rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(95deg, #f97316, #ea580c);
+            color: white;
+            box-shadow: 0 8px 16px -6px rgba(249, 115, 22, 0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            transition: margin 0.3s;
+        }
+
+        .topbar {
+            background: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #1e293b;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ea580c, #c2410c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .datetime {
+            font-weight: 500;
+            background: #f1f5f9;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 14px;
+        }
+
+        /* PAGE CONTENT */
+        .page-content {
+            padding: 28px 32px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* CARDS */
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+        }
+
+        .card-header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #fff7ed;
+            padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #c2410c;
+        }
+
+        /* STATS - WARNA ORANYE */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+        }
+
+        .stat-icon.siswa { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .stat-icon.ekskul { background: linear-gradient(135deg, #fb923c, #f97316); }
+        .stat-icon.pembina { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .stat-icon.daftar { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+
+        .stat-info h3 {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        /* TABLES */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 12px 8px;
+            background: #fff7ed;
+            font-weight: 600;
+            color: #c2410c;
+        }
+
+        .table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: #f97316;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #ea580c;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #78716c;
+            color: white;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #57534e;
+        }
+
+        input, select {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: 24px;
+        }
+
+        .filter-bar .form-group {
+            min-width: 180px;
+        }
+
+        /* ABSENSI */
+        .absensi-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+        }
+
+        .camera-container {
+            background: #0f172a;
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 20px;
+            background: #000;
+            transform: scaleX(-1);
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .captured-preview {
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .captured-preview img {
+            max-width: 100%;
+            border-radius: 20px;
+            border: 3px solid #f97316;
+        }
+
+        .riwayat-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ea580c;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            opacity: 0;
+            transition: 0.2s;
+            z-index: 1000;
+        }
+
+        .mt-20 { margin-top: 20px; }
+        .mb-20 { margin-bottom: 20px; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f97316, #ea580c);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-warning {
+            background: #fed7aa;
+            color: #9a3412;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .sidebar.open { transform: translateX(0); }
+            .absensi-container { grid-template-columns: 1fr; }
+        }
+
+        .empty-state { text-align: center; padding: 40px; color: #94a3b8; }
+        .captured-text { color: #f97316; margin-top: 8px; font-weight: bold; }
+        
+        /* Print styles */
+        @media print {
+            .sidebar, .topbar, .btn, .filter-bar button, .menu-toggle {
+                display: none !important;
+            }
+            .main-content {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+                <img src="logo.png" width=110 height=110 alt="Logo SMK Negeri 8 Malang" onerror="this.src='https://placehold.co/50x50?text=SMK'">
+            <div class="brand-text">
+                <h2>Ekstrakurikuler</h2>
+                <span>SMK Negeri 8 Malang</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard"><i class="fas fa-grid-2"></i><span>Dashboard</span></a>
+            <a href="#" class="nav-item" data-page="siswa"><i class="fas fa-user-graduate"></i><span>Data Siswa</span></a>
+            <a href="#" class="nav-item" data-page="ekskul"><i class="fas fa-futbol"></i><span>Jenis Ekskul</span></a>
+            <a href="#" class="nav-item" data-page="pembina"><i class="fas fa-chalkboard-teacher"></i><span>Pembina</span></a>
+            <a href="#" class="nav-item" data-page="pendaftaran"><i class="fas fa-clipboard-list"></i><span>Pendaftaran</span></a>
+            <a href="#" class="nav-item" data-page="absensi"><i class="fas fa-camera-retro"></i><span>Absensi Foto</span></a>
+            <a href="#" class="nav-item" data-page="rekapan"><i class="fas fa-chart-line"></i><span>Rekapan Absen</span></a>
+        </nav>
+    </aside>
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left"><button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button><h1 class="page-title" id="pageTitle">Dashboard</h1></div>
+            <div class="topbar-right"><div class="datetime" id="datetime"></div></div>
+        </header>
+        <div class="page-content" id="pageContent">
+            <!-- DASHBOARD -->
+            <div class="page active" id="page-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-icon siswa"><i class="fas fa-users"></i></div><div class="stat-info"><h3 id="countSiswa">0</h3><p>Total Siswa</p></div></div>
+                    <div class="stat-card"><div class="stat-icon ekskul"><i class="fas fa-layer-group"></i></div><div class="stat-info"><h3 id="countEkskul">0</h3><p>Ekskul Tersedia</p></div></div>
+                    <div class="stat-card"><div class="stat-icon pembina"><i class="fas fa-user-tie"></i></div><div class="stat-info"><h3 id="countPembina">0</h3><p>Pembina</p></div></div>
+                    <div class="stat-card"><div class="stat-icon daftar"><i class="fas fa-clipboard-check"></i></div><div class="stat-info"><h3 id="countPendaftaran">0</h3><p>Pendaftaran</p></div></div>
+                </div>
+                <div class="card"><div class="card-header"><h3>Pendaftaran Terbaru</h3></div><div class="card-body"><div class="table-responsive"><table class="table" id="tableRecentDaftar"><thead><tr><th>Siswa</th><th>Ekskul</th><th>Tanggal</th></tr></thead><tbody></tbody></table></div></div></div>
+            </div>
+            <!-- SISWA -->
+            <div class="page" id="page-siswa">
+                <div class="card"><div class="card-header"><h3><i class="fas fa-user-graduate"></i> Tambah Siswa</h3></div><div class="card-body"><form id="formSiswa" style="display:grid; gap:20px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));"><div class="form-group"><label>Nama Lengkap</label><input type="text" id="namaSiswa" placeholder="Masukkan nama lengkap" required></div><div class="form-group"><label>Kelas</label><select id="kelasSiswa" required><option value="">Pilih Kelas</option><option value="X">X</option><option value="XI">XI</option><option value="XII">XII</option></select></div><div class="form-group"><label>Jenis Kelamin</label><div style="display:flex; gap:16px;"><label><input type="radio" name="gender" value="Laki-laki" checked> Laki-laki</label><label><input type="radio" name="gender" value="Perempuan"> Perempuan</label></div></div><div class="form-group"><button type="submit" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Tambah Siswa</button></div></form></div></div>
+                <div class="card mt-20"><div class="card-header"><h3>Daftar Siswa</h3></div><div class="card-body"><div class="table-responsive"><table class="table" id="tableSiswa"><thead><tr><th>#</th><th>Nama</th><th>Kelas</th><th>Gender</th><th>Aksi</th></tr></thead><tbody></tbody></table></div></div></div>
+            </div>
+            <!-- EKSKUL -->
+            <div class="page" id="page-ekskul">
+                <div class="card"><div class="card-header"><h3><i class="fas fa-futbol"></i> Tambah Ekskul</h3></div><div class="card-body"><form id="formEkskul" style="display:grid; gap:20px; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));"><div class="form-group"><label>Nama Ekskul</label><input type="text" id="namaEkskul" placeholder="Nama ekskul" required></div><div class="form-group"><label>Hari</label><select id="hariEkskul" required><option value="">Pilih Hari</option><option value="Senin">Senin</option><option value="Selasa">Selasa</option><option value="Rabu">Rabu</option><option value="Kamis">Kamis</option><option value="Jumat">Jumat</option><option value="Sabtu">Sabtu</option></select></div><div class="form-group"><label>Waktu</label><input type="time" id="waktuEkskul" required></div><div class="form-group"><label>Tempat</label><input type="text" id="tempatEkskul" placeholder="Lokasi" required></div><div class="form-group"><button type="submit" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Tambah Ekskul</button></div></form></div></div>
+                <div class="card mt-20"><div class="card-header"><h3>Daftar Ekskul</h3></div><div class="card-body"><div class="table-responsive"><table class="table" id="tableEkskul"><thead><tr><th>#</th><th>Nama</th><th>Hari</th><th>Waktu</th><th>Tempat</th><th>Aksi</th></tr></thead><tbody></tbody></table></div></div></div>
+            </div>
+            <!-- PEMBINA -->
+            <div class="page" id="page-pembina">
+                <div class="card"><div class="card-header"><h3><i class="fas fa-chalkboard-teacher"></i> Tambah Pembina</h3></div><div class="card-body"><form id="formPembina" style="display:grid; gap:20px; grid-template-columns:1fr 1fr auto;"><div class="form-group"><label>Nama Pembina</label><input type="text" id="namaPembina" placeholder="Nama lengkap" required></div><div class="form-group"><label>No. HP</label><input type="tel" id="hpPembina" placeholder="08xxxxxxxxxx" required></div><div class="form-group"><button type="submit" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Tambah Pembina</button></div></form></div></div>
+                <div class="card mt-20"><div class="card-header"><h3>Daftar Pembina</h3></div><div class="card-body"><div class="table-responsive"><table class="table" id="tablePembina"><thead><tr><th>#</th><th>Nama</th><th>No. HP</th><th>Aksi</th></tr></thead><tbody></tbody></table></div></div></div>
+            </div>
+            <!-- PENDAFTARAN -->
+            <div class="page" id="page-pendaftaran">
+                <div class="card"><div class="card-header"><h3><i class="fas fa-clipboard-list"></i> Pendaftaran Ekskul</h3></div><div class="card-body"><form id="formPendaftaran" style="display:grid; gap:20px; grid-template-columns:1fr 1fr 1fr auto;"><div class="form-group"><label>Pilih Siswa</label><select id="pilihSiswa" required><option value="">Pilih Siswa</option></select></div><div class="form-group"><label>Pilih Ekskul</label><select id="pilihEkskul" required><option value="">Pilih Ekskul</option></select></div><div class="form-group"><label>Tanggal Daftar</label><input type="date" id="tglDaftar" required></div><div class="form-group"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Daftarkan</button></div></form></div></div>
+                <div class="card mt-20"><div class="card-header"><h3>Data Pendaftaran</h3></div><div class="card-body"><div class="table-responsive"><table class="table" id="tablePendaftaran"><thead><tr><th>#</th><th>Siswa</th><th>Kelas</th><th>Ekskul</th><th>Tanggal</th><th>Aksi</th></tr></thead><tbody></tbody></table></div></div></div>
+            </div>
+            <!-- ABSENSI -->
+            <div class="page" id="page-absensi">
+                <div class="card"><div class="card-header"><h3><i class="fas fa-camera-retro"></i> Absensi dengan Foto</h3></div><div class="card-body"><div class="absensi-container"><div class="absensi-left"><div class="form-group"><label>Pilih Ekskul</label><select id="absensiEkskul" required><option value="">Pilih Ekskul</option></select></div><div class="form-group"><label>Pilih Siswa (yang sudah terdaftar)</label><select id="absensiSiswa" required><option value="">Pilih Siswa</option></select></div><div class="camera-container"><video id="cameraPreview" autoplay playsinline></video><canvas id="cameraCanvas" style="display:none;"></canvas><div class="camera-controls"><button type="button" class="btn btn-secondary" id="btnStartCamera"><i class="fas fa-play"></i> Mulai Kamera</button><button type="button" class="btn btn-primary" id="btnCapture" disabled><i class="fas fa-camera"></i> Ambil Foto</button></div><div class="captured-preview" id="capturedPreview" style="display:none;"><img id="capturedImage" src="" alt="Hasil Foto"><p class="captured-text">Foto berhasil diambil ✓</p></div></div></div><div class="absensi-right"><div class="absensi-riwayat"><h4>Riwayat Absensi Hari Ini</h4><div class="riwayat-list" id="riwayatList"><p class="empty-state">Belum ada absensi.</p></div></div></div></div></div></div>
+            </div>
+            <!-- REKAPAN ABSENSI BULANAN -->
+            <div class="page" id="page-rekapan">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-line"></i> Rekapan Kehadiran Bulanan</h3>
+                        <div>
+                            <button class="btn btn-secondary" id="btnPrintRekap"><i class="fas fa-print"></i> Cetak Laporan</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="filter-bar">
+                            <div class="form-group">
+                                <label>Pilih Ekskul</label>
+                                <select id="rekapEkskul">
+                                    <option value="">Semua Ekskul</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Bulan</label>
+                                <select id="rekapBulan">
+                                    <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                                    <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                                    <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                                    <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tahun</label>
+                                <input type="number" id="rekapTahun" value="2026" style="width:100px;">
+                            </div>
+                            <button class="btn btn-primary" id="btnFilterRekap"><i class="fas fa-search"></i> Tampilkan</button>
+                        </div>
+                        <div id="rekapResult">
+                            <div class="table-responsive">
+                                <table class="table" id="tableRekap">
+                                    <thead>
+                                        <tr><th>No</th><th>Nama Siswa</th><th>Kelas</th><th>Ekskul</th><th>Total Hadir</th><th>Jadwal Ekskul (hari/bulan)</th><th>Persentase</th><th>Status</th></tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+    // ---------- DATA STORAGE ----------
+    let siswa = JSON.parse(localStorage.getItem('siswa') || '[]');
+    let ekskul = JSON.parse(localStorage.getItem('ekskul') || '[]');
+    let pembina = JSON.parse(localStorage.getItem('pembina') || '[]');
+    let pendaftaran = JSON.parse(localStorage.getItem('pendaftaran') || '[]');
+    let absensi = JSON.parse(localStorage.getItem('absensi') || '[]');
+
+    function saveAll() {
+        localStorage.setItem('siswa', JSON.stringify(siswa));
+        localStorage.setItem('ekskul', JSON.stringify(ekskul));
+        localStorage.setItem('pembina', JSON.stringify(pembina));
+        localStorage.setItem('pendaftaran', JSON.stringify(pendaftaran));
+        localStorage.setItem('absensi', JSON.stringify(absensi));
+    }
+
+    function showToast(msg, ok=true) { 
+        let t=document.getElementById('toast'); 
+        t.innerText=msg; 
+        t.style.opacity='1'; 
+        t.style.background=ok?'#ea580c':'#ef4444'; 
+        setTimeout(()=>t.style.opacity='0',2000); 
+    }
+
+    // Render All
+    function renderAll() {
+        renderSiswa(); renderEkskul(); renderPembina(); renderPendaftaran(); renderDashboard(); renderAbsensiSelects(); renderRiwayatAbsensi();
+        renderRekapSelect();
+        const siswaSel = document.getElementById('pilihSiswa'); 
+        if(siswaSel){ siswaSel.innerHTML='<option value="">Pilih Siswa</option>'+siswa.map(s=>`<option value="${s.id}">${s.nama} (${s.kelas})</option>`).join(''); }
+        const ekskulSel = document.getElementById('pilihEkskul'); 
+        if(ekskulSel){ ekskulSel.innerHTML='<option value="">Pilih Ekskul</option>'+ekskul.map(e=>`<option value="${e.id}">${e.nama} (${e.hari})</option>`).join(''); }
+        const absensiEkskulSel = document.getElementById('absensiEkskul'); 
+        if(absensiEkskulSel){ absensiEkskulSel.innerHTML='<option value="">Pilih Ekskul</option>'+ekskul.map(e=>`<option value="${e.id}">${e.nama}</option>`).join(''); }
+        document.getElementById('absensiSiswa').innerHTML='<option value="">Pilih Siswa</option>';
+    }
+
+    function renderDashboard() {
+        document.getElementById('countSiswa').innerText = siswa.length;
+        document.getElementById('countEkskul').innerText = ekskul.length;
+        document.getElementById('countPembina').innerText = pembina.length;
+        document.getElementById('countPendaftaran').innerText = pendaftaran.length;
+        let recent = [...pendaftaran].reverse().slice(0,5);
+        let tbody = document.querySelector('#tableRecentDaftar tbody');
+        tbody.innerHTML = recent.map(p => {
+            let s = siswa.find(sis=>sis.id == p.siswaId) || {nama:'?'};
+            let e = ekskul.find(ek=>ek.id == p.ekskulId) || {nama:'?'};
+            return `<tr><td>${s.nama}</td><td>${e.nama}</td><td>${p.tanggal}</td></tr>`;
+        }).join('');
+    }
+
+    function renderSiswa() {
+        let tbody = document.querySelector('#tableSiswa tbody');
+        tbody.innerHTML = siswa.map((s,idx)=>`<tr><td>${idx+1}</td><td>${s.nama}</td><td>${s.kelas}</td><td>${s.gender}</td><td><button class="btn btn-danger" style="padding:4px 12px;" onclick="hapusSiswa(${s.id})">Hapus</button></td></tr>`).join('');
+    }
+    window.hapusSiswa = (id) => { siswa = siswa.filter(s=>s.id!=id); pendaftaran = pendaftaran.filter(p=>p.siswaId!=id); absensi = absensi.filter(a=>a.siswaId!=id); saveAll(); renderAll(); showToast('Siswa dihapus'); };
+    
+    function renderEkskul() {
+        let tbody = document.querySelector('#tableEkskul tbody');
+        tbody.innerHTML = ekskul.map((e,idx)=>`<tr><td>${idx+1}</td><td>${e.nama}</td><td>${e.hari}</td><td>${e.waktu}</td><td>${e.tempat}</td><td><button class="btn btn-danger" style="padding:4px 12px;" onclick="hapusEkskul(${e.id})">Hapus</button></td></tr>`).join('');
+    }
+    window.hapusEkskul = (id) => { ekskul = ekskul.filter(e=>e.id!=id); pendaftaran = pendaftaran.filter(p=>p.ekskulId!=id); absensi = absensi.filter(a=>a.ekskulId!=id); saveAll(); renderAll(); showToast('Ekskul dihapus'); };
+    
+    function renderPembina() {
+        let tbody = document.querySelector('#tablePembina tbody');
+        tbody.innerHTML = pembina.map((p,idx)=>`<tr><td>${idx+1}</td><td>${p.nama}</td><td>${p.hp}</td><td><button class="btn btn-danger" style="padding:4px 12px;" onclick="hapusPembina(${p.id})">Hapus</button></td></tr>`).join('');
+    }
+    window.hapusPembina = (id) => { pembina = pembina.filter(p=>p.id!=id); saveAll(); renderAll(); showToast('Pembina dihapus'); };
+    
+    function renderPendaftaran() {
+        let tbody = document.querySelector('#tablePendaftaran tbody');
+        tbody.innerHTML = pendaftaran.map((p,idx)=>{
+            let s = siswa.find(sis=>sis.id == p.siswaId) || {nama:'?', kelas:'?'};
+            let e = ekskul.find(ek=>ek.id == p.ekskulId) || {nama:'?'};
+            return `<tr><td>${idx+1}</td><td>${s.nama}</td><td>${s.kelas}</td><td>${e.nama}</td><td>${p.tanggal}</td><td><button class="btn btn-danger" style="padding:4px 12px;" onclick="hapusPendaftaran(${p.id})">Batal</button></td></tr>`;
+        }).join('');
+    }
+    window.hapusPendaftaran = (id) => { pendaftaran = pendaftaran.filter(p=>p.id!=id); absensi = absensi.filter(a=>a.pendaftaranId!=id); saveAll(); renderAll(); showToast('Pendaftaran dibatalkan'); };
+    
+    function renderAbsensiSelects() {
+        const ekskulId = document.getElementById('absensiEkskul').value;
+        if(ekskulId){
+            let daftarSiswaIds = pendaftaran.filter(p=>p.ekskulId == ekskulId).map(p=>p.siswaId);
+            let siswaTerdaftar = siswa.filter(s=>daftarSiswaIds.includes(s.id));
+            document.getElementById('absensiSiswa').innerHTML = '<option value="">Pilih Siswa</option>'+siswaTerdaftar.map(s=>`<option value="${s.id}">${s.nama} - ${s.kelas}</option>`).join('');
+        } else { document.getElementById('absensiSiswa').innerHTML = '<option value="">Pilih Siswa</option>'; }
+    }
+    
+    function renderRiwayatAbsensi() {
+        let today = new Date().toISOString().slice(0,10);
+        let list = absensi.filter(a=>a.tanggal === today);
+        let container = document.getElementById('riwayatList');
+        if(list.length===0) container.innerHTML = '<p class="empty-state">Belum ada absensi.</p>';
+        else container.innerHTML = list.map(a=>{ let s=siswa.find(sis=>sis.id==a.siswaId); let e=ekskul.find(ex=>ex.id==a.ekskulId); return `<div style="padding:12px; border-bottom:1px solid #e2e8f0;"><strong>${s?.nama}</strong> - ${e?.nama}<br><small>${a.waktu}</small><br><img src="${a.foto}" width="100%" style="border-radius:12px; margin-top:6px;"></div>`; }).join('');
+    }
+
+    // REKAPAN FUNCTIONS
+    function renderRekapSelect() {
+        let select = document.getElementById('rekapEkskul');
+        if(select) {
+            select.innerHTML = '<option value="">Semua Ekskul</option>' + ekskul.map(e => `<option value="${e.id}">${e.nama}</option>`).join('');
+        }
+    }
+
+    function getJumlahHariEkskulPerBulan(ekskulId, bulan, tahun) {
+        let ekskulItem = ekskul.find(e => e.id == ekskulId);
+        if(!ekskulItem) return 0;
+        
+        let hariMap = { 'Senin':1, 'Selasa':2, 'Rabu':3, 'Kamis':4, 'Jumat':5, 'Sabtu':6, 'Minggu':0 };
+        let targetDay = hariMap[ekskulItem.hari];
+        if(targetDay === undefined) return 0;
+        
+        let date = new Date(tahun, bulan - 1, 1);
+        let count = 0;
+        while(date.getMonth() === bulan - 1) {
+            if(date.getDay() === targetDay) count++;
+            date.setDate(date.getDate() + 1);
+        }
+        return count;
+    }
+
+    function renderRekap() {
+        let ekskulId = document.getElementById('rekapEkskul').value;
+        let bulan = parseInt(document.getElementById('rekapBulan').value);
+        let tahun = parseInt(document.getElementById('rekapTahun').value);
+        
+        let filteredPendaftaran = pendaftaran;
+        if(ekskulId) {
+            filteredPendaftaran = pendaftaran.filter(p => p.ekskulId == ekskulId);
+        }
+        
+        let rekapData = [];
+        
+        for(let p of filteredPendaftaran) {
+            let siswaItem = siswa.find(s => s.id == p.siswaId);
+            let ekskulItem = ekskul.find(e => e.id == p.ekskulId);
+            if(!siswaItem || !ekskulItem) continue;
+            
+            let absensiCount = absensi.filter(a => 
+                a.siswaId == p.siswaId && 
+                a.ekskulId == p.ekskulId &&
+                a.tanggal.startsWith(tahun + '-' + String(bulan).padStart(2,'0'))
+            ).length;
+            
+            let totalJadwal = getJumlahHariEkskulPerBulan(p.ekskulId, bulan, tahun);
+            let persentase = totalJadwal > 0 ? (absensiCount / totalJadwal * 100).toFixed(1) : 0;
+            let status = persentase >= 80 ? 'Baik' : (persentase >= 60 ? 'Cukup' : 'Perlu Bimbingan');
+            
+            rekapData.push({
+                siswaId: p.siswaId,
+                siswaNama: siswaItem.nama,
+                siswaKelas: siswaItem.kelas,
+                ekskulId: p.ekskulId,
+                ekskulNama: ekskulItem.nama,
+                ekskulHari: ekskulItem.hari,
+                hadir: absensiCount,
+                totalJadwal: totalJadwal,
+                persentase: persentase,
+                status: status
+            });
+        }
+        
+        let tbody = document.querySelector('#tableRekap tbody');
+        if(rekapData.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Tidak ada data untuk periode ini</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = rekapData.map((item, idx) => {
+            let statusClass = item.status === 'Baik' ? 'badge-success' : 'badge-warning';
+            let progressWidth = item.persentase + '%';
+            return `
+                <tr>
+                    <td>${idx+1}</td>
+                    <td><strong>${item.siswaNama}</strong></td>
+                    <td>${item.siswaKelas}</td>
+                    <td>${item.ekskulNama}</td>
+                    <td>${item.hadir} / ${item.totalJadwal}</td>
+                    <td>${item.ekskulHari}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span>${item.persentase}%</span>
+                            <div class="progress-bar" style="flex:1;"><div class="progress-fill" style="width:${progressWidth}"></div></div>
+                        </div>
+                    </td>
+                    <td><span class="${statusClass}">${item.status}</span></td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // Forms
+    document.getElementById('formSiswa')?.addEventListener('submit',(e)=>{
+        e.preventDefault(); let nama=document.getElementById('namaSiswa').value; let kelas=document.getElementById('kelasSiswa').value; let gender=document.querySelector('input[name="gender"]:checked').value;
+        if(!nama||!kelas) return showToast('Lengkapi data',false);
+        siswa.push({id:Date.now(), nama, kelas, gender});
+        saveAll(); renderAll(); e.target.reset(); showToast('Siswa ditambahkan');
+    });
+    document.getElementById('formEkskul')?.addEventListener('submit',(e)=>{
+        e.preventDefault(); let nama=document.getElementById('namaEkskul').value; let hari=document.getElementById('hariEkskul').value; let waktu=document.getElementById('waktuEkskul').value; let tempat=document.getElementById('tempatEkskul').value;
+        if(!nama||!hari||!waktu||!tempat) return showToast('Lengkapi data',false);
+        ekskul.push({id:Date.now(), nama, hari, waktu, tempat});
+        saveAll(); renderAll(); e.target.reset(); showToast('Ekskul ditambahkan');
+    });
+    document.getElementById('formPembina')?.addEventListener('submit',(e)=>{
+        e.preventDefault(); let nama=document.getElementById('namaPembina').value; let hp=document.getElementById('hpPembina').value;
+        if(!nama||!hp) return showToast('Lengkapi data',false);
+        pembina.push({id:Date.now(), nama, hp});
+        saveAll(); renderAll(); e.target.reset(); showToast('Pembina ditambahkan');
+    });
+    document.getElementById('formPendaftaran')?.addEventListener('submit',(e)=>{
+        e.preventDefault(); let siswaId=parseInt(document.getElementById('pilihSiswa').value); let ekskulId=parseInt(document.getElementById('pilihEkskul').value); let tgl=document.getElementById('tglDaftar').value;
+        if(!siswaId||!ekskulId||!tgl) return showToast('Lengkapi data',false);
+        let sudah = pendaftaran.some(p=>p.siswaId===siswaId && p.ekskulId===ekskulId);
+        if(sudah) return showToast('Siswa sudah terdaftar di ekskul ini',false);
+        pendaftaran.push({id:Date.now(), siswaId, ekskulId, tanggal:tgl});
+        saveAll(); renderAll(); e.target.reset(); showToast('Berhasil daftar ekskul');
+    });
+    
+    document.getElementById('absensiEkskul')?.addEventListener('change',()=>{ renderAbsensiSelects(); });
+    document.getElementById('btnFilterRekap')?.addEventListener('click',()=>{ renderRekap(); });
+    document.getElementById('btnPrintRekap')?.addEventListener('click',()=>{ window.print(); });
+    
+    // CAMERA & ABSENSI
+    let video = document.getElementById('cameraPreview');
+    let canvas = document.getElementById('cameraCanvas');
+    let stream = null;
+    document.getElementById('btnStartCamera')?.addEventListener('click', async()=>{
+        try{ if(stream) stream.getTracks().forEach(t=>t.stop()); stream = await navigator.mediaDevices.getUserMedia({video:true}); video.srcObject = stream; document.getElementById('btnCapture').disabled=false; showToast('Kamera siap'); }catch(e){ showToast('Gagal akses kamera',false); }
+    });
+    document.getElementById('btnCapture')?.addEventListener('click',()=>{
+        let context = canvas.getContext('2d'); canvas.width = video.videoWidth; canvas.height = video.videoHeight; context.drawImage(video,0,0,canvas.width,canvas.height);
+        let fotoData = canvas.toDataURL('image/png');
+        let siswaId = parseInt(document.getElementById('absensiSiswa').value);
+        let ekskulId = parseInt(document.getElementById('absensiEkskul').value);
+        if(!siswaId||!ekskulId){ showToast('Pilih siswa dan ekskul dulu',false); return; }
+        let today = new Date().toISOString().slice(0,10);
+        let sudahAbsen = absensi.some(a=>a.siswaId===siswaId && a.ekskulId===ekskulId && a.tanggal===today);
+        if(sudahAbsen){ showToast('Sudah absen hari ini!',false); return; }
+        absensi.push({id:Date.now(), siswaId, ekskulId, tanggal:today, waktu:new Date().toLocaleTimeString(), foto:fotoData});
+        saveAll(); renderRiwayatAbsensi(); document.getElementById('capturedPreview').style.display='block'; document.getElementById('capturedImage').src=fotoData;
+        setTimeout(()=>document.getElementById('capturedPreview').style.display='none',3000);
+        showToast('Absensi berhasil dengan foto');
+    });
+    
+    // SIDEBAR & CLOCK
+    function initClock(){ let d=new Date(); document.getElementById('datetime').innerHTML=d.toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+' | '+d.toLocaleTimeString('id-ID'); setInterval(()=>{let d=new Date(); document.getElementById('datetime').innerHTML=d.toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+' | '+d.toLocaleTimeString('id-ID');},1000);}
+    
+    document.querySelectorAll('.nav-item').forEach(link=>{ 
+        link.addEventListener('click',(e)=>{ 
+            e.preventDefault(); 
+            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); 
+            link.classList.add('active'); 
+            let page=link.dataset.page; 
+            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); 
+            document.getElementById(`page-${page}`).classList.add('active'); 
+            document.getElementById('pageTitle').innerHTML=link.querySelector('span')?.innerText||page; 
+            if(page==='absensi') renderAbsensiSelects(); 
+            if(page==='pendaftaran') renderAll(); 
+            if(page==='dashboard') renderDashboard();
+            if(page==='rekapan') { renderRekapSelect(); renderRekap(); }
+        }); 
+    });
+    
+    document.getElementById('menuToggle').addEventListener('click',()=>{ document.getElementById('sidebar').classList.toggle('open'); });
+    
+    let now = new Date();
+    document.getElementById('rekapTahun').value = now.getFullYear();
+    document.getElementById('rekapBulan').value = now.getMonth() + 1;
+    
+    renderAll(); initClock();
+</script>
+</body>
+</html>
